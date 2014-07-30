@@ -268,11 +268,12 @@ for i=1:num_files
         
     if ~isempty(file.removed_events)
     defAns={num2str(file.mahal_cutoff)};
-    fca_writefcs([bead_dir f{i}(1:end-4) '_normalized_beads.fcs'],file.removed_events,file.markernames,file.channelnames,file.header);       
+    fca_writefcs([bead_dir f{i}(1:end-4) '_normalized_removedEvents.fcs'],file.removed_events,file.markernames,file.channelnames,file.header);       
     end
     fprintf(fid,'Removing %g events from %s with beadDist <= %g\n',size(file.removed_events,1),f{i},file.mahal_cutoff);
     end
     
+    fca_writefcs([bead_dir f{i}(1:end-4) '_beads.fcs'],bead_data{i}(:,[1 end 2:end-1]),['Time' 'EventNum' file.channelnames(file.bead_channels)],['Time' 'EventNum' file.channelnames(file.bead_channels)],file.header);
     fca_writefcs([norm_dir f{i}(1:end-4) '_normalized.fcs'],file.data,file.markernames,file.channelnames,file.header);
     
     
