@@ -240,7 +240,37 @@ bead_data=bead_data(normthisfile);
 
 allbeads=cat(1,bead_data{:});
 
-bead_means=median(allbeads(:,2:(num_beads+1)));  
+%set baseline to which we're normalizing
+quest=questdlg('Do you want to normalize to saved FCS files of beads?','Normalization Baseline','No','Yes','No');
+if strcmp(quest,'Yes')
+    [oldBead_files,oldBead_dir] = uigetfile({'*.fcs','*.FCS'},'Choose File(s) of Gated Beads','MultiSelect','on');
+    if oldBead_dir==0
+        return
+    else
+        if iscell(oldBead_files) %selected > 1 fcs file
+            
+            num_oldBeadfiles=length(oldBead_files);
+            oldBead_vals=cell(1,num_oldBeadfiles);
+            for i=1:num_oldBeadfiles
+                file=norm_cytof(fullfile(oldBead_dir,oldBead_files{i}),sbtrct);
+                file=file.find_bead_channels(bead_metals);
+                oldBead_vals{i}=file.data(:,file.bead_channels);
+                clear file
+            end
+            all_oldBeads=cat(1,oldBead_vals{:});
+        else
+            file=norm_cytof(fullfile(oldBead_dir,oldBead_files),sbtrct);
+            file=file.find_bead_channels(bead_metals);
+            all_oldBeads=file.data(:,file.bead_channels);
+        end
+        bead_means=median(all_oldBeads);
+    end
+else
+    bead_means=median(allbeads(:,2:(num_beads+1)));
+end
+
+
+
 bead_window=200;
 normedbeads=cell(1,num_files);
 smoothed=cell(1,num_files);
