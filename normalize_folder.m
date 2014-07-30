@@ -322,13 +322,15 @@ for i=1:num_files
 end
 if num_files>1
 plot(asinh(1/5*smoothedmeds),'o-','markersize',4,'linewidth',1)
+xl=[0.5 num_files+0.5];
 else
     s=size(smoothed{1},1);
  plot(1:s,asinh(1/5*smoothed{1}),'linewidth',1.5)
+ xl=[1 s];
 % plot(ones(1,num_beads),asinh(1/5*smoothedmeds'),'o','markersize',4,'linewidth',1) 
 end
 
-xl=[0.5 num_files+0.5];
+
 yl=get(gca,'ylim');
 
 filemeds=1:num_files;
