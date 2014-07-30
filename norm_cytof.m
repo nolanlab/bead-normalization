@@ -47,10 +47,10 @@ classdef norm_cytof
             obj.time_col = find(strcmpi('time',obj.channelnames));
             obj.cell_length_col = find(strcmpi('cell_length',obj.channelnames));
             
-            dna(1)=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir191')));
-            dna(2)=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir193')));
+            dna_1=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir191')));
+            dna_2=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir193')));
             
-            obj.dna_channels=dna;
+            obj.dna_channels=[dna_1 dna_2];
             
             obj.marker_channels=1:length(obj.channelnames);
             obj.marker_channels([obj.time_col obj.cell_length_col])=[];
