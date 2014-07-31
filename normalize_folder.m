@@ -241,7 +241,7 @@ bead_data=bead_data(normthisfile);
 allbeads=cat(1,bead_data{:});
 
 %set baseline to which we're normalizing
-quest=questdlg('Do you want to normalize to saved FCS files of beads?','Normalization Baseline','No','Yes','No');
+quest=questdlg('Do you want to normalize to the median level of the current files, or to previously saved FCS file(s) of beads?','Normalization Baseline','Current Files','Saved Files','Current Files');
 if strcmp(quest,'Yes')
     [oldBead_files,oldBead_dir] = uigetfile({'*.fcs','*.FCS'},'Choose File(s) of Gated Beads','MultiSelect','on');
     if oldBead_dir==0
