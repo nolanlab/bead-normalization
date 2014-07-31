@@ -65,36 +65,84 @@ classdef norm_cytof
             
             global num_beads
             
-            m=obj.channelnames;
+            quest=questdlg('Which bead metals did you use?','Choose Bead Masses','DVS Beads (140,151,153,165,175)','Beta Beads (139,141,159,169,175)','Custom','DVS Beads (140,151,153,165,175)');
             
-            default_masses={'La139','Pr141','Tb159','Tm169','Lu175'};
-            num_defaults=length(default_masses);
-            bead_cols=zeros(1,num_defaults);
-            
-            for j=1:num_defaults
-                bci=find(~cellfun(@isempty,strfind(m,default_masses{j})));
-                if ~isempty(bci)
-                    bead_cols(j)=bci;
-                end
+            switch quest
+                
+                case 'DVS Beads (140,151,153,165,175)'
+                    
+                    default_masses={'Ce140','Eu151','Eu153','Ho165','Lu175'};
+                     num_defaults=length(default_masses);
+                    bead_cols=zeros(1,num_defaults);
+                    
+                    for j=1:num_defaults
+                        bci=find(~cellfun(@isempty,strfind(obj.channelnames,default_masses{j})));
+                        if ~isempty(bci)
+                            bead_cols(j)=bci;
+                        end
+                    end
+                    
+                    obj.bead_channels=bead_cols(bead_cols~=0);
+                    num_beads=length(obj.bead_channels);
+                    obj.bead_metals=cell(1,num_beads);
+                    for j=1:num_beads
+                        obj.bead_metals{j}=obj.channelnames{obj.bead_channels(j)};
+                    end
+                    
+                case 'Beta Beads (139,141,159,169,175)'
+                    
+                    default_masses={'La139','Pr141','Tb159','Tm169','Lu175'};
+                    num_defaults=length(default_masses);
+                    bead_cols=zeros(1,num_defaults);
+                    
+                    for j=1:num_defaults
+                        bci=find(~cellfun(@isempty,strfind(obj.channelnames,default_masses{j})));
+                        if ~isempty(bci)
+                            bead_cols(j)=bci;
+                        end
+                    end
+                    
+                    obj.bead_channels=bead_cols(bead_cols~=0);
+                    num_beads=length(obj.bead_channels);
+                    obj.bead_metals=cell(1,num_beads);
+                    for j=1:num_beads
+                        obj.bead_metals{j}=obj.channelnames{obj.bead_channels(j)};
+                    end
+                    
+                case 'Custom'
+                    massfig=figure('KeyPressFcn',@mass_return);
+                    col_list=uicontrol('parent',massfig,...
+                        'style','listbox',...
+                        'string',obj.channelnames,...
+                        'units','normalized',...
+                        'position',[0.1 0.3 0.8 0.6],...
+                        'max',2,...
+                        'min',0);
+%                         'value',bead_cols(bead_cols ~= 0)); %it's possible that not all default bead masses were found
+                    uicontrol('parent',massfig',...
+                        'style','pushbutton',...
+                        'string','Choose Bead Masses',...
+                        'units','normalized',...
+                        'position',[0.4 0.1 0.2 0.1],...
+                        'Callback',{@set_bead_metals})
+                    
+                    waitfor(massfig)
             end
             
-            massfig=figure('KeyPressFcn',@mass_return);
-            col_list=uicontrol('parent',massfig,...
-                'style','listbox',...
-                'string',m,...
-                'units','normalized',...
-                'position',[0.1 0.3 0.8 0.6],...
-                'max',2,...
-                'min',0,...
-                'value',bead_cols(bead_cols ~= 0)); %it's possible that not all default bead masses were found
-            uicontrol('parent',massfig',...
-                'style','pushbutton',...
-                'string','Choose Bead Masses',...
-                'units','normalized',...
-                'position',[0.4 0.1 0.2 0.1],...
-                'Callback',{@set_bead_metals})
+%             m=obj.channelnames;
+%             
+%             default_masses={'La139','Pr141','Tb159','Tm169','Lu175'};
+%             num_defaults=length(default_masses);
+%             bead_cols=zeros(1,num_defaults);
+%             
+%             for j=1:num_defaults
+%                 bci=find(~cellfun(@isempty,strfind(m,default_masses{j})));
+%                 if ~isempty(bci)
+%                     bead_cols(j)=bci;
+%                 end
+%             end
             
-            waitfor(massfig)
+            
             
             function mass_return(src,event)
                 
@@ -110,9 +158,6 @@ classdef norm_cytof
                 obj.bead_metals=cell(1,num_beads);
                 for i=1:num_beads
                     metal=obj.channelnames{obj.bead_channels(i)};
-%                     p1=strfind(metal,'(');
-%                     p2=strfind(metal,')');
-%                     obj.bead_metals{i}=metal(p1(end):p2(end));
                     obj.bead_metals{i}=metal;
                 end
                 close(massfig);
