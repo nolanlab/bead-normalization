@@ -182,9 +182,19 @@ classdef norm_cytof
             global num_beads
             
             
-           
             dnadata=asinh(1/5*(obj.data(:,obj.dna_channels(1))));
             beaddata=asinh(1/5*(obj.data(:,obj.bead_channels)));
+            
+            %if too many cells, sample for visualization
+            num_cells=size(obj.data,1);
+            if num_cells > 100000
+                inds=randsample(num_cells,100000);
+                sampled_dnadata=dnadata(inds,:);
+                sampled_beaddata=beaddata(inds,:);
+            else      
+                sampled_dnadata=dnadata;
+                sampled_beaddata=beaddata;
+            end
             
             
             fig=figure('position',figpos,...
@@ -197,7 +207,7 @@ classdef norm_cytof
             for i=1:num_beads
                 ax(i)=subplot(1,num_beads,i);
                 hold on
-                ph(i)=plot(beaddata(:,i),dnadata,'.','color',[0.3 0.3 .3],'markersize',2);
+                ph(i)=plot(sampled_beaddata(:,i),sampled_dnadata,'.','color',[0.3 0.3 .3],'markersize',2);
                 set(ax(i),'xtick',obj.ticks,'xticklabel',obj.ticklabels,'ytick',obj.ticks,'yticklabel',obj.ticklabels)
                 set(ax(i),'xtick',obj.ticks,'xticklabel',[],'ytick',obj.ticks,'yticklabel',[])
                 xlabel(obj.channelnames{obj.bead_channels(i)})
@@ -216,30 +226,44 @@ classdef norm_cytof
             
             function replot(src,event)
                 if exist('gates','var')  %these won't exist yet if you hit a key too soon
-                beads=true(size(dnadata));
-                xp=cell(1,num_beads);
-                yp=cell(1,num_beads);
-                for j=1:num_beads
-                    xp{j}=get(gates(j),'xdata');
-                    yp{j}=get(gates(j),'ydata');
-                    
-                    beads = beads & inpolygon(beaddata(:,j),dnadata,xp{j},yp{j});
-                end
+                
                 
                 if strcmp(event.Key,'space')
                     beadcolor=[1 0 0];
+                    
+                    beads=true(size(sampled_dnadata));
+                    xp=cell(1,num_beads);
+                    yp=cell(1,num_beads);
+                    for j=1:num_beads
+                        xp{j}=get(gates(j),'xdata');
+                        yp{j}=get(gates(j),'ydata');
+                        
+                        beads = beads & inpolygon(sampled_beaddata(:,j),sampled_dnadata,xp{j},yp{j});
+                    end
+                    
                     for j=1:num_beads
                         ch=findall(ax(j),'color',beadcolor);
                         if ~isempty(ch)
-                            set(ch,'xdata',beaddata(beads,j),'ydata',dnadata(beads))
+                            set(ch,'xdata',sampled_beaddata(beads,j),'ydata',sampled_dnadata(beads))
                             set(ax(j),'children',[gates(j) ch ph(j)]);
                         else
-                            ch=plot(ax(j),beaddata(beads,j),dnadata(beads),'+','color',beadcolor,'markersize',4);
+                            ch=plot(ax(j),sampled_beaddata(beads,j),sampled_dnadata(beads),'+','color',beadcolor,'markersize',4);
                             set(ax(j),'children',[gates(j) ch ph(j)]);
                         end
                     end
                     drawnow;
                 elseif strcmp(event.Key,'return')
+                    
+                    %use all, rather than sampled, data now
+                    beads=true(size(dnadata));
+                    xp=cell(1,num_beads);
+                    yp=cell(1,num_beads);
+                    for j=1:num_beads
+                        xp{j}=get(gates(j),'xdata');
+                        yp{j}=get(gates(j),'ydata');
+                        
+                        beads = beads & inpolygon(beaddata(:,j),dnadata,xp{j},yp{j});
+                    end
                     
                     obj.xp=xp;
                     obj.yp=yp;
