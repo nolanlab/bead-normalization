@@ -422,20 +422,33 @@ classdef norm_cytof
             global figpos
             global num_beads
             
-            tdata=asinh(1/5*obj.data(:,obj.bead_channels));
+            tdata=asinh(1/5*obj.data(:,obj.bead_channels));          
+            
             if sum(obj.beads)>num_beads
-            mdists=mahal(tdata,tdata(obj.beads,:));
-            mdists=sqrt(mdists);
+                mdists=mahal(tdata,tdata(obj.beads,:));
+                mdists=sqrt(mdists);
+                
+                %sample for visualization if too many cells
+                num_cells=size(tdata,1);
+                if num_cells>100000
+                    inds=randsample(num_cells,100000);
+                    tdata_sampled=tdata(inds,:);
+                    mdists_sampled=mdists(inds,:);
+                else
+                    tdata_sampled=tdata;
+                    mdists_sampled=mdists;
+                end
             else
-%                obj.removed_events=[obj.data(~notbeads,:) mdists(~notbeads)];
-             obj.data=[obj.data zeros(size(obj.data,1),1)];
-            obj.channelnames=[obj.channelnames 'beadDist'];
-            obj.markernames=[obj.markernames 'beadDist'];            
-            obj.mahal_cutoff=0;
-            h=warndlg(['Too few beads to estimate distances in ' obj.header.filename ': you must remove them manually.'] ,'Sparse beads!');
-            waitfor(h)
-            drawnow
-            return
+                
+                %                obj.removed_events=[obj.data(~notbeads,:) mdists(~notbeads)];
+                obj.data=[obj.data zeros(size(obj.data,1),1)];
+                obj.channelnames=[obj.channelnames 'beadDist'];
+                obj.markernames=[obj.markernames 'beadDist'];
+                obj.mahal_cutoff=0;
+                h=warndlg(['Too few beads to estimate distances in ' obj.header.filename ': you must remove them manually.'] ,'Sparse beads!');
+                waitfor(h)
+                drawnow
+                return
             end
             
             
@@ -448,8 +461,8 @@ classdef norm_cytof
             %             fig=figure('position',[1 0.3*sc(4) sc(3) sc(3)/3]);
             
             nbins=20;
-            [~,bin]=histc(mdists,0:nbins);
-
+            [~,bin]=histc(mdists_sampled,0:nbins);
+            
             cm=flipud(jet(nbins+1));
             colormap(cm);
             obj.numcm=nbins+1;
@@ -462,10 +475,10 @@ classdef norm_cytof
                 ax=zeros(1,3);
                 ax(1)=axes('position',[0.0625 0.1 0.25 0.75]);
                 hold on
-                plot(tdata(bin==0,combos(1,1)),tdata(bin==0,combos(1,2)),'+','color',cm(end,:),'markersize',2)
+                plot(tdata_sampled(bin==0,combos(1,1)),tdata_sampled(bin==0,combos(1,2)),'+','color',cm(end,:),'markersize',2)
                 for j=1:nbins
                     i=nbins+1-j;
-                    plot(tdata(bin==i,combos(1,1)),tdata(bin==i,combos(1,2)),'+','color',cm(i,:),'markersize',2)
+                    plot(tdata_sampled(bin==i,combos(1,1)),tdata_sampled(bin==i,combos(1,2)),'+','color',cm(i,:),'markersize',2)
                 end
                 
                 xlabel(obj.channelnames{obj.bead_channels(combos(1,1))})
@@ -473,10 +486,10 @@ classdef norm_cytof
                 
                 ax(2)=axes('position',[0.375 0.1 0.25 0.75]);
                 hold on
-                plot(tdata(bin==0,combos(end-1,1)),tdata(bin==0,combos(end-1,2)),'+','color',cm(end,:),'markersize',2)
+                plot(tdata_sampled(bin==0,combos(end-1,1)),tdata_sampled(bin==0,combos(end-1,2)),'+','color',cm(end,:),'markersize',2)
                 for j=1:nbins
                     i=nbins+1-j;
-                    plot(tdata(bin==i,combos(end-1,1)),tdata(bin==i,combos(end-1,2)),'+','color',cm(i,:),'markersize',2)
+                    plot(tdata_sampled(bin==i,combos(end-1,1)),tdata_sampled(bin==i,combos(end-1,2)),'+','color',cm(i,:),'markersize',2)
                 end
                 
                 xlabel(obj.channelnames{obj.bead_channels(combos(end-1,1))})
@@ -484,10 +497,10 @@ classdef norm_cytof
                 
                 ax(3)=axes('position',[0.6875 0.1 0.25 0.75]);
                 hold on
-                plot(tdata(bin==0,combos(end,1)),tdata(bin==0,combos(end,2)),'+','color',cm(end,:),'markersize',2)
+                plot(tdata_sampled(bin==0,combos(end,1)),tdata_sampled(bin==0,combos(end,2)),'+','color',cm(end,:),'markersize',2)
                 for j=1:nbins
                     i=nbins+1-j;
-                    plot(tdata(bin==i,combos(end,1)),tdata(bin==i,combos(end,2)),'+','color',cm(i,:),'markersize',2)
+                    plot(tdata_sampled(bin==i,combos(end,1)),tdata_sampled(bin==i,combos(end,2)),'+','color',cm(i,:),'markersize',2)
                 end
                 
                 xlabel(obj.channelnames{obj.bead_channels(combos(end,1))})
@@ -503,9 +516,9 @@ classdef norm_cytof
                 ax=axes('position',[0.375 0.1 0.25 0.75]);
                 hold on
                 for i=1:nbins
-                    plot(tdata(bin==i,1),tdata(bin==i,2),'+','color',cm(i,:),'markersize',2)
+                    plot(tdata_sampled(bin==i,1),tdata_sampled(bin==i,2),'+','color',cm(i,:),'markersize',2)
                 end
-                plot(tdata(bin==0,1),tdata(bin==0,2),'+','color',cm(end,:),'markersize',2)
+                plot(tdata_sampled(bin==0,1),tdata_sampled(bin==0,2),'+','color',cm(end,:),'markersize',2)
                 xlabel(obj.channelnames{obj.bead_channels(1)})
                 ylabel(obj.channelnames{obj.bead_channels(2)})
                 
@@ -541,14 +554,14 @@ classdef norm_cytof
             %             else
             QuestOpt.Position=questpos;
             if nargin<3
-            defAns={''};
+                defAns={''};
             end
             while (1)
-            cutoff=str2double(myInputdlg({'Type in the cutoff, then press Enter. (You can enter 0 if you do not want to apply a cutoff.)'},...
-                'Choose Cutoff',1,defAns,QuestOpt));
-            if 0<=cutoff && cutoff<Inf && ~isnan(cutoff)
-                break
-            end
+                cutoff=str2double(myInputdlg({'Type in the cutoff, then press Enter. (You can enter 0 if you do not want to apply a cutoff.)'},...
+                    'Choose Cutoff',1,defAns,QuestOpt));
+                if 0<=cutoff && cutoff<Inf && ~isnan(cutoff)
+                    break
+                end
             end
             
             
@@ -563,12 +576,6 @@ classdef norm_cytof
             obj.markernames=[obj.markernames 'beadDist'];
             
             obj.mahal_cutoff=cutoff;
-                
-           
-
-            
-            
-            
             
             function mahal_cutoff(src,event)
                 shift=false;

@@ -245,7 +245,10 @@ quest=questdlg('Do you want to normalize to saved FCS files of beads?','Normaliz
 if strcmp(quest,'Yes')
     [oldBead_files,oldBead_dir] = uigetfile({'*.fcs','*.FCS'},'Choose File(s) of Gated Beads','MultiSelect','on');
     if oldBead_dir==0
-        return
+        h=warndlg('No bead files selected! Normalizing to the median bead level.' ,'No files selected');
+        waitfor(h)
+        drawnow
+        bead_means=median(allbeads(:,2:(num_beads+1)));
     else
         if iscell(oldBead_files) %selected > 1 fcs file
             
