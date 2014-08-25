@@ -360,7 +360,11 @@ xl=[0.5 num_files+0.5];
 else
     s=size(smoothed{1},1);
  plot(1:s,asinh(1/5*smoothed{1}),'linewidth',1.5)
- xl=[1 s];
+ if s>1
+     xl=[1 s];
+ else
+     xl=[0 2];
+ end
 % plot(ones(1,num_beads),asinh(1/5*smoothedmeds'),'o','markersize',4,'linewidth',1) 
 end
 
