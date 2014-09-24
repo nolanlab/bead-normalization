@@ -8,7 +8,7 @@ global num_beads
 %%
 
 try
-    
+   
     
 %% want the default figure window to be full width of the screen and not too tall
 nm=get(0,'monitorpositions');
@@ -224,7 +224,7 @@ end
 
 %bead directory is inside normed directory
 bead_dir=[data_dir 'beads' filesep];
-if rmv && ~exist(bead_dir,'dir')
+if ~exist(bead_dir,'dir')
     mkdir(bead_dir)
 end
 
@@ -501,10 +501,14 @@ end
 %%
 
 catch err
+    if isdeployed
     str=sprintf('%s\n%s\n%s%s%g',err.identifier, err.message, err.stack.name, ' line ',err.stack.line);
     h=warndlg(str ,'Error');
         waitfor(h)
         return
+    else
+        rethrow(err)
+    end
 end
 
 
