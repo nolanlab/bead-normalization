@@ -46,6 +46,7 @@ classdef norm_cytof
             % find time, cell length and DNA channels
             obj.time_col = find(strcmpi('time',obj.channelnames));
             obj.cell_length_col = find(strcmpi('cell_length',obj.channelnames));
+            obj.cell_length_col = find(~cellfun(@isempty,regexp('cell_length|event_length',lower(obj.channelnames))));
             
             dna_1=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir191')));
             dna_2=find(~cellfun(@isempty,strfind(obj.channelnames,'Ir193')));
