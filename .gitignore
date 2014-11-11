@@ -1,0 +1,5 @@
+sample_data/*
+*.DS_Store
+*.prj
+*~
+NormalizerR*
