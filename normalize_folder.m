@@ -225,7 +225,7 @@ end
         %set baseline to which we're normalizing
         
         quest=questdlg('Do you want to normalize to the median level of the current files, or to previously saved FCS file(s) of beads?','Normalization Baseline','Current Files','Saved Files','Current Files');
-        if strcmp(quest,'Yes')
+        if strcmp(quest,'Saved Files')
             [oldBead_files,oldBead_dir] = uigetfile({'*.fcs','*.FCS'},'Choose File(s) of Gated Beads','MultiSelect','on');
             if oldBead_dir==0
                 h=warndlg('No bead files selected! Normalizing to the median bead level.' ,'No files selected');
