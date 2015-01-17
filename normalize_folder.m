@@ -52,10 +52,16 @@ try
          rmv=r;   
     end
     
-    %bead directory is inside normed directory
+    %bead directory is no longer inside normed directory to make cytobank
+    %upload easier
     bead_dir=[data_dir 'beads' filesep];
     if ~exist(bead_dir,'dir')
         mkdir(bead_dir)
+    end
+    
+    rmv_dir=[data_dir 'removed_events' filesep];
+    if rmv && ~exist(rmv_dir,'dir')
+        mkdir(rmv_dir)
     end
     
     %update to not include skipped files
@@ -287,7 +293,7 @@ end
                 
                 if ~isempty(file.removed_events)
                     defAns={num2str(file.mahal_cutoff)};
-                    fca_writefcs([bead_dir f{i}(1:end-4) '_normalized_removedEvents.fcs'],file.removed_events,file.markernames,file.channelnames,file.header);
+                    fca_writefcs([rmv_dir f{i}(1:end-4) '_normalized_removedEvents.fcs'],file.removed_events,file.markernames,file.channelnames,file.header);
                 end
                 fprintf(fid,'Removing %g events from %s with beadDist <= %g\n',size(file.removed_events,1),f{i},file.mahal_cutoff);
             end
