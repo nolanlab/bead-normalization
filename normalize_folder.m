@@ -185,10 +185,12 @@ end
                 yp=file.yp;
                 bead_count=sum(file.beads);
                 if bead_count==0
-                    quest=questdlg('No beads are in the gate.  Either try again, or skip normalizing this file.','No Beads Found!','Re-gate','Skip file','Re-gate');
+                    quest=questdlg('No beads are in the gate.  Either try again, skip normalizing this file, or quit the normalizer.','No Beads Found!','Re-gate','Skip file','Quit','Re-gate');
                     if strcmp(quest,'Skip file')
                         normthisfile(i)=false;
                         break
+                    elseif strcmp(quest,'Quit')
+                        error('Beads not found!')
                     end
                 else
                     break
