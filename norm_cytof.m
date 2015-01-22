@@ -516,7 +516,7 @@ classdef norm_cytof
             
             if num_beads>2
                 
-                combos=combntns(1:num_beads,2);
+                combos=nchoosek(1:num_beads,2);
                 
                 ax=zeros(1,3);
                 ax(1)=axes('position',[0.0625 0.1 0.25 0.75]);
