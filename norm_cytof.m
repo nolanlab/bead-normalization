@@ -383,12 +383,6 @@ classdef norm_cytof
         
         function obj = compute_bead_slopes(obj,baseline)
             
-            global num_beads
-            
-            if nargin<2
-                baseline=mean(obj.bead_data(2:(num_beads+1)));
-            end
-            
             s=size(obj.smoothed_beads,1);
             y=repmat(baseline,[s 1]);
             
